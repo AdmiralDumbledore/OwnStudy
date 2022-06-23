@@ -1,4 +1,0 @@
-[masters]
-ce ansible_host=192.168.56.141 ansible_user=root
-ub ansible_host=192.168.56.139 ansible_user=user ansible_sudo_pass=qwqw1212
-[workstations]
