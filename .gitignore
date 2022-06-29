@@ -1,2 +1,3 @@
 /ansible_host_preconfig/group_vars
 /ansible_host_preconfig/hosts.txt
+/ansible_host_preconfig/source/*

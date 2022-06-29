@@ -1,0 +1,28 @@
+---
+- name: Loops
+  hosts: ub
+  become: yes
+
+  tasks:
+  - name: echo loop
+    debug: msg="Number {{ item }}"
+    with_items:
+      - "1"
+      - "2"
+      - "3"
+      - "4"
+
+  - name: until loop
+    shell: echo -n HE >> new.txt ; cat new.txt
+    register: output
+    delay: 1
+    retries: 4
+    until: output.stdout.find("HEHEHE") == false
+
+  - name: packages pack Deb
+    apt: name={{ item }} state=latest
+    with_items:
+      - tree
+      - htop
+      - python
+      

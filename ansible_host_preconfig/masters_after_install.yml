@@ -3,6 +3,9 @@
   hosts: masters
   become: true
 
+  vars: 
+    source_fld: ./source
+
   tasks:
   - name: Check Linux version
     debug: var=ansible_os_family
@@ -79,3 +82,10 @@
           update_cache: true
           
     when: ansible_os_family == "Debian"
+
+  - name: Start and enable Docker
+    service: name=docker state=started enabled=yes
+
+  - name: Copy files to webservers
+    copy: src={{ item }} dest=/var/www/html mode=0555
+    with_fileglob: "{{ source_fld }}/*.*"
