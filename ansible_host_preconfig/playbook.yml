@@ -1,0 +1,21 @@
+---
+- name: Main playbook
+  hosts: "{{ MYHOST }}"
+  become: true
+
+  vars:
+    hello: "HE"
+    source_fld: "{{ source }}"
+
+  tasks:
+    - name: Pinguem
+      ping:
+
+    - name: Check Linux version
+      debug: var=ansible_os_family
+
+    - name: Make some loops
+      include: loops.yml
+
+    - name: Install Docker + Git
+      include: install_docker_git.yml
