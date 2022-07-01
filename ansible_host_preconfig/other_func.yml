@@ -1,0 +1,6 @@
+---
+
+- name: Copy to ub
+  copy: src=./source/awesome.jpg dest=/home/ansible mode=0555
+  delegate_to: ub
+  

@@ -8,6 +8,9 @@
     source_fld: "{{ source }}"
 
   tasks:
+    - name: try new
+      include: other_func.yml
+
     - name: Pinguem
       ping:
 
