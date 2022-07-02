@@ -1,6 +1,4 @@
 ---
-
-
 - name: echo loop
   debug: msg="Number {{ item }}"
   with_items:

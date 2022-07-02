@@ -1,6 +1,26 @@
 ---
+- name: Check date 
+  shell: date > /tmp/date.txt && cat /tmp/date.txt
+  register: date_content
+
+- name: Show date
+  debug:
+    msg: "{{ date_content.stdout }}"
+  run_once: true
 
 - name: Copy to ub
   copy: src=./source/awesome.jpg dest=/home/ansible mode=0555
   delegate_to: ub
-  
+
+- name: Reboot servers
+  shell: sleep 5 && reboot
+  async: 1
+  poll: 0
+
+- name: Wait for restart 
+  wait_for: 
+    host: "{{ inventory_hostname }}"
+    state: started
+    delay: 5
+    timeout: 40
+  delegate_to: 127.0.0.1

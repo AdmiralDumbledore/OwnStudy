@@ -29,7 +29,7 @@
 
   when: ansible_os_family == "RedHat"
 
-- block:      #DB
+- block:      #Deb
     - name: Install apache
       apt: name=apache2 state=latest
 
