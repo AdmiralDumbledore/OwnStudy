@@ -7,13 +7,26 @@
   vars:
     hello: "HE"
     source_fld: "{{ source }}"
+    admin_pass: !vault |
+          $ANSIBLE_VAULT;1.1;AES256
+          38393135306130623461363961376263633864373862613837653866353761613364303238396634
+          6638353236313930393865353439353236343966626237630a343336656138656236643831373165
+          63396566623832653136363334313733356135613661623433383436666434396232626131373232
+          6238353561666530330a353463306265663330633639333662346636333462663965343134613438
+          6165
 
   tasks:
-    - name: date + restart
-      include: other_func.yml
-
     - name: Pinguem
       ping:
+
+    - name: Send encrypted pass
+      copy:
+        dest: /root/admin_pass
+        content:
+          password= {{ admin_pass }}
+
+    - name: date + restart
+      include: other_func.yml
 
     - name: Check Linux version
       debug: var=ansible_os_family
