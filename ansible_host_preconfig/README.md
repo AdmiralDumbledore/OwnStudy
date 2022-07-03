@@ -1,4 +1,4 @@
-# Ansible traning
+# Ansible training
 # Russian
 Изучение механик работы и практика Ansible
 # English
