@@ -7,10 +7,12 @@
   debug:
     msg: "{{ date_content.stdout }}"
   run_once: true
+  failed_when: "'error' in date_content.stdout"
 
 - name: Copy to ub
   copy: src=./source/awesome.jpg dest=/home/ansible mode=0555
   delegate_to: ub
+  ignore_errors: true
 
 - name: Reboot servers
   shell: sleep 5 && reboot
