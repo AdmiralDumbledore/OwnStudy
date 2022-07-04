@@ -1,0 +1,39 @@
+---
+# - block:      #RedHat
+#   - name: Install epel
+#     yum:
+#       name: epel-release
+#       state: latest
+
+#   - name: Install nginx
+#     yum:
+#       name: nginx
+#       state: latest
+
+#   when: ansible_os_family == "RedHat"
+
+- block:      #Debian 
+  - name: Install nginx
+    apt:
+      name: nginx
+      state: latest
+  
+  when: ansible_os_family == "Debian"
+
+
+- name: Start nginx
+  service:
+    name: nginx
+    state: started
+
+- name: Copy config
+  copy:
+      src: ./source/nginx.conf
+      dest: /etc/nginx/nginx.conf
+  notify: Restart Nginx
+  
+
+
+
+
+  

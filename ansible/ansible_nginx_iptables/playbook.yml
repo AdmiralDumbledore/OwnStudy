@@ -1,0 +1,25 @@
+---
+- name: Install(configure) nginx + configure iptables
+  hosts: all
+  any_errors_fatal: true
+  become: true
+
+  tasks:
+    - name: Ping
+      ping:
+    
+    - name: Check Linux version
+      debug: var=ansible_os_family
+
+    - name: Install nginx
+      include: install_nginx.yml
+
+    - name: Configure firewall
+      include: configure_iptables.yml
+
+
+  handlers:
+    - name: Restart Nginx
+      service: 
+        name: nginx
+        state: restarted
