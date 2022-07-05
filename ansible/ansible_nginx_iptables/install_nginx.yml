@@ -1,16 +1,16 @@
 ---
-# - block:      #RedHat
-#   - name: Install epel
-#     yum:
-#       name: epel-release
-#       state: latest
+- block:      #RedHat
+  - name: Install epel
+    yum:
+      name: epel-release
+      state: latest
 
-#   - name: Install nginx
-#     yum:
-#       name: nginx
-#       state: latest
+  - name: Install nginx
+    yum:
+      name: nginx
+      state: latest
 
-#   when: ansible_os_family == "RedHat"
+  when: ansible_os_family == "RedHat"
 
 - block:      #Debian 
   - name: Install nginx

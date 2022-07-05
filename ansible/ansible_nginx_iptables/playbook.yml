@@ -11,11 +11,12 @@
     - name: Check Linux version
       debug: var=ansible_os_family
 
+    - name: Configure firewall
+      include: configure_iptables.yml
+
     - name: Install nginx
       include: install_nginx.yml
 
-    - name: Configure firewall
-      include: configure_iptables.yml
 
 
   handlers:
