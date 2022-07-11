@@ -3,3 +3,4 @@
 /ansible/ansible_nginx_iptables/hosts.txt
 /ansible/ansible_host_preconfig/source
 /ansible/ansible_zabbix/hosts.txt
+/ansible/ansible_centos7_upgrade8/hosts.txt
