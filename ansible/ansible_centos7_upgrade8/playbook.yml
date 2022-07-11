@@ -1,0 +1,127 @@
+---
+- hosts: centos
+  # any_errors_fatal: true
+  become: true
+
+  vars_prompt:
+    - name: confirmation
+      prompt: "Are you sure you have prepared the system for an upgrade? Answer with 'YES'"
+      default: "NO"
+      private: false
+
+  tasks:
+  - debug:
+      msg:
+      - "{{ hostvars[inventory_hostname].ansible_distribution }}"
+      - "{{ hostvars[inventory_hostname].ansible_distribution_major_version }}"
+      - "{{ hostvars[inventory_hostname].ansible_distribution_version }}"
+
+  - name: "Check if yum is installed"
+    package_facts:
+      manager: "auto"
+
+
+  - block:
+      - block:          
+          - name: Install required packages
+            yum: name={{ item }} state=latest
+            with_items: 
+            - epel-release
+            - yum-utils
+            - rpmconf
+
+          - name: Important! Perform reconciliation of configs before next steps. Important!
+            debug:
+              msg:
+              - "Important! Perform reconciliation of configs before next steps. Important!"
+
+          - name: Update to latest Centos 7
+            yum: name=* state=latest
+            failed_when: confirmation != "YES"
+
+          - name: Check current Centos version
+            debug: 
+              msg:
+              - "{{ hostvars[inventory_hostname].ansible_distribution_version }}"
+
+          - name: Install dnf
+            yum: name=dnf state=latest
+
+          - name: Remove yum package manager
+            dnf: name={{ item }} state=absent
+            with_items: 
+            - yum 
+            - yum-metadata-parser
+
+          - name: Remove yum configs
+            file:
+              state: absent
+              path: /etc/yum
+
+        when: "'yum' in ansible_facts.packages"
+
+      
+      - name: change CentOS baseURL from mirror.centos.org to vault.centos.org
+        shell: "{{ item }}"
+        with_items:  
+          - sed -i 's/mirrorlist/#mirrorlist/g' /etc/yum.repos.d/CentOS-*
+          - sed -i 's|#baseurl=http://mirror.centos.org|baseurl=http://vault.centos.org|g' /etc/yum.repos.d/CentOS-*
+    
+      - name: Install CentOS 8 release package
+        shell: dnf install -y http://vault.centos.org/8.5.2111/BaseOS/x86_64/os/Packages/{centos-linux-repos-8-3.el8.noarch.rpm,centos-linux-release-8.5-1.2111.el8.noarch.rpm,centos-gpg-keys-8-3.el8.noarch.rpm}
+      
+      - name: Upgrade via dnf
+        dnf: name=* state=latest
+        failed_when: confirmation != "YES"
+
+      - rpm_key:
+          state: present
+          key: https://dl.fedoraproject.org/pub/epel/RPM-GPG-KEY-EPEL-8
+
+
+      - name: Upgrade epel repo
+        dnf: 
+          name: 'https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm'
+          state: present
+
+
+        
+
+      - name: Remove the old CentOS 7 Kernel
+        shell: rpm -e --nodeps sysvinit-tools ; rpm -e `rpm -q kernel`
+        when: 
+          - "'sysvinit-tools' in ansible_facts.packages"
+          - "'kernel' in ansible_facts.packages"
+
+      - name: Clear dnf cache
+        command: dnf clean all
+      
+      
+      - name: Upgrade to 8. This action may take a long time.
+        shell: dnf -y --releasever=8 --allowerasing --setopt=deltarpm=false distro-sync
+
+      - name: Install kernel-core
+        dnf: name=kernel-core state=latest
+        
+      - name: Upgrade via dnf
+        dnf: name=* state=latest
+      
+      - name: Install minimal packages
+        dnf:
+          name: '{{ item }}'
+          state: latest
+        with_items: 
+          - '@Core'
+          - '@Minimal Install'
+
+      - name: Reboot servers
+        shell: sleep 5 && reboot
+        async: 1
+        poll: 0
+
+      - name: Check current Centos version
+        debug: 
+          msg:
+          - "{{ hostvars[inventory_hostname].ansible_distribution_version }}"
+      
+    when: ansible_os_family == "RedHat"

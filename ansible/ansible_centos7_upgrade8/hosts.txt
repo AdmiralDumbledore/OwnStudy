@@ -1,0 +1,2 @@
+[centos]
+ce8 ansible_host=192.168.56.143 ansible_user=root
